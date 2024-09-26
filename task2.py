@@ -7,7 +7,9 @@ pd.set_option('display.max_columns', None)
 
 # Base data directory
 BASE_DIR = "data"
-
+BASE_OUTPUT_DIR = "output"
+if not os.path.exists(BASE_OUTPUT_DIR):
+    os.makedirs(BASE_OUTPUT_DIR)
 
 # Function to load data from the specified ticker, year, and month
 def load_data(ticker):
@@ -93,8 +95,8 @@ def resample_data(df, timeframe):
 
 # Prompt the user for input parameters
 derivative = input("Choose a derivative (Nifty, BankNifty, FinNifty): ").strip()
-start_date = input("Specify the start date (YYYY-MM-DD): ").strip()
-expiry_date = input("Specify the expiry date (YYYY-MM-DD): ").strip()
+start_date = input("Specify the start date (YYYY-MM-DD): (Optional)").strip()
+expiry_date = input("Specify the expiry date (YYYY-MM-DD): (Optional)").strip()
 timeframes = input("Enter timeframes (e.g., 1 minute, 5 minutes, 1 hour, 1 day) separated by commas: ").split(',')
 strategy = input("Choose a trading strategy (Moving Average Crossover, RSI, Bollinger Bands): ").strip()
 
@@ -122,5 +124,5 @@ if derivative in ticker_map:
             resampled_df = apply_strategy(resampled_df, strategy)
             # Display the processed data
             print(resampled_df)
-            output_file = f"task2_{strategy}_trading_signals.xlsx"
+            output_file = f"{BASE_OUTPUT_DIR}/task2 {strategy} trading signals.xlsx"
             resampled_df.to_excel(output_file, index=True)

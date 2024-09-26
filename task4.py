@@ -12,45 +12,36 @@ def backtest_strategy(df, strategy_func, timeframe):
         'Close': 'last',
         'Volume': 'sum'
     }).dropna()
-    # Apply the strategy function to the resampled data
     df_signals = strategy_func(df_resampled)
-
-    # Calculate trade statistics
     df_signals['Position'] = df_signals['Signal'].diff()
 
-    # Calculate the number of trades
-    num_trades = len(df_signals[df_signals['Position'] != 0])
-    print("number of trades", num_trades)
+    df_signals['Returns'] = df_signals['Close'].pct_change()
+    df_signals['Strategy_Returns'] = df_signals['Returns'] * df_signals['Position'].shift(1)
 
-    # Total profit/loss calculation using Entry_Price and Exit_Price
-    total_profit_loss = (df_signals['Exit_Price'].sum() - df_signals['Entry_Price'].sum())
-    print(f"total profit or loss {total_profit_loss}")
-    print(df_signals['Exit_Price'], df_signals['Entry_Price'])
-    # print("length", len(df_signals[df_signals['Exit_Price'] > df_signals['Entry_Price']]))
-    win_rate = (len(df_signals[df_signals['Exit_Price'] > df_signals['Entry_Price']]) / num_trades * 100) if num_trades > 0 else 0
+    # Calculate backtesting metrics
+    num_trades = len(df_signals['Position'][df_signals['Position'] != 0])
+    total_profit_loss = df_signals['Strategy_Returns'].sum()
+    win_rate = (df_signals['Strategy_Returns'][df_signals['Strategy_Returns'] > 0].count() / num_trades) * 100
+    sharpe_ratio = df_signals['Strategy_Returns'].mean() / df_signals['Strategy_Returns'].std()
+    max_drawdown = (df_signals['Strategy_Returns'].cumsum().max() - df_signals['Strategy_Returns'].cumsum().min()) / df_signals[
+        'Strategy_Returns'].cumsum().max()
 
-    # Example risk-adjusted metrics
-    df_signals['Return'] = (df_signals['Exit_Price'] - df_signals['Entry_Price']) / df_signals['Entry_Price']
-    sharpe_ratio = np.mean(df_signals['Return']) / np.std(df_signals['Return']) if np.std(df_signals['Return']) != 0 else 0
-    df_signals['Drawdown'] = df_signals['Return'].cumsum() - df_signals['Return'].cumsum().cummax()
-    max_drawdown = df_signals['Drawdown'].min() if not df_signals['Drawdown'].empty else 0
-
-    backtest_results = {
-        'Timeframe': timeframe,
+    results = {
         'Number of Trades': num_trades,
         'Total Profit/Loss': total_profit_loss,
-        'Win Rate (%)': win_rate,
+        'Win Rate': win_rate,
         'Sharpe Ratio': sharpe_ratio,
         'Maximum Drawdown': max_drawdown
     }
 
-    return backtest_results
+    return results
+
 
 if __name__ == "__main__":
     derivative = input("Choose a derivative (Nifty, BankNifty, FinNifty): ").strip()
     strategy = input("Choose a strategy (Moving Average Crossover, RSI): ").strip()
 
-    timeframe_list = ["1Min"] #['1Min', '5Min', '1h', '1D', '1ME']  # Define the list of timeframes to backtest
+    timeframe_list = ['1Min', '5Min', '1h', '1D', '1ME']  # Define the list of timeframes to backtest
     ticker_map = {
         "Nifty": "NSEI",
         "BankNifty": "^NSEBANK",

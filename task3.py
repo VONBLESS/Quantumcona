@@ -6,6 +6,9 @@ pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
 BASE_DIR = "data"
+BASE_OUTPUT_DIR = "output"
+if not os.path.exists(BASE_OUTPUT_DIR):
+    os.makedirs(BASE_OUTPUT_DIR)
 
 def load_data(ticker):
     # Construct the path for the ticker
@@ -149,12 +152,12 @@ if __name__ == "__main__":
 
         if strategy == "Moving Average Crossover":
             df = moving_average_crossover(df)
-            output_file = "MAC_trading_signals.xlsx"
+            output_file = f"{BASE_OUTPUT_DIR}/MAC_trading_signals.xlsx"
             df.to_excel(output_file, index=True)
             # print(df[['Close', 'SMA_Short', 'SMA_Long', 'Signal', 'Entry_Price', 'Exit_Price']])
         elif strategy == "RSI":
             df = rsi_strategy(df)
-            output_file = "RSI_trading_signals.xlsx"
+            output_file = f"{BASE_OUTPUT_DIR}/RSI_trading_signals.xlsx"
             df.to_excel(output_file, index=True)
             # print(df[['Close', 'RSI', 'Signal', 'Entry_Price', 'Exit_Price']])
         else:
