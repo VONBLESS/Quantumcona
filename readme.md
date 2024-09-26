@@ -1,5 +1,4 @@
-Here’s a sample `README.md` for your GitHub repository based on your task and code:
-
+All tasks given on task.pdf file in this repo
 ---
 # Task 1
 ## Historical Data Management for Derivatives
