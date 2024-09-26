@@ -251,12 +251,133 @@ This strategy generates buy and sell signals based on the RSI indicator:
 - **Buy Signal:** When the short-term moving average crosses above the long-term moving average.
 - **Sell Signal:** When the short-term moving average crosses below the long-term moving average.
 - **Stop-Loss:** Automatically exits the trade if the price falls more than the specified percentage below the entry price.
+```
+def moving_average_crossover(df, short_window=20, long_window=50, stop_loss_pct=0.08):
+    df['SMA_Short'] = df['Close'].rolling(window=short_window).mean()
+    df['SMA_Long'] = df['Close'].rolling(window=long_window).mean()
+
+    df['Signal'] = 0
+    df['Signal'] = np.where(df['SMA_Short'] > df['SMA_Long'], 1, -1)
+
+
+    # Stop-loss implementation
+    df['Entry_Price'] = np.nan
+    df['Exit_Price'] = np.nan
+    position = None
+    entry_price = None
+
+    for i in range(1, len(df)):
+        if df['Signal'].iloc[i] == 1 and position != 'long':
+            # Enter buy (long) position
+            position = 'long'
+            entry_price = df['Close'].iloc[i]
+            df.iloc[i, df.columns.get_loc('Entry_Price')] = entry_price
+        elif df['Signal'].iloc[i] == -1 and position == 'long':
+            # Exit long position
+            position = None
+            df.iloc[i, df.columns.get_loc('Exit_Price')] = df['Close'].iloc[i]
+        elif position == 'long':
+            # Check for stop-loss condition
+            if df['Close'].iloc[i] < entry_price * (1 - stop_loss_pct):
+                position = None
+                df.iloc[i, df.columns.get_loc('Exit_Price')] = df['Close'].iloc[i]
+```
 
 ### RSI (Relative Strength Index)
 - **Buy Signal:** When RSI is below 30 (oversold conditions).
 - **Sell Signal:** When RSI is above 70 (overbought conditions).
 - **Stop-Loss:** Automatically exits the trade if the price drops more than the specified percentage below the entry price.
+```
+def rsi_strategy(df, rsi_period=14, rsi_oversold=30, rsi_overbought=70, stop_loss_pct=0.02):
+    delta = df['Close'].diff()
+    gain = delta.where(delta > 0, 0).rolling(window=rsi_period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=rsi_period).mean()
+    rs = gain / loss
+    df['RSI'] = 100 - (100 / (1 + rs))
 
+    df['Signal'] = 0
+    df.loc[df['RSI'] < 30, 'Signal'] = 1  # Buy signal
+    df.loc[df['RSI'] > 70, 'Signal'] = -1  # Sell signal
+
+    # Stop-loss implementation
+    df['Entry_Price'] = np.where(df['Signal'] == 1, df['Close'], np.nan)
+    df['Exit_Price'] = np.where(df['Signal'] == -1, df['Close'], np.nan)
+
+    position = None
+    entry_price = None
+
+    for i in range(1, len(df)):
+        if df['Signal'].iloc[i] == 1 and position != 'long':
+            # Enter buy (long) position
+            position = 'long'
+            entry_price = df['Close'].iloc[i]
+            df.iloc[i, df.columns.get_loc('Entry_Price')] = entry_price
+        elif df['Signal'].iloc[i] == -1 and position == 'long':
+            # Exit long position
+            position = None
+            df.iloc[i, df.columns.get_loc('Exit_Price')] = df['Close'].iloc[i]
+        elif position == 'long':
+            # Check for stop-loss condition
+            if df['Close'].iloc[i] < entry_price * (1 - stop_loss_pct):
+                position = None
+                df.iloc[i, df.columns.get_loc('Exit_Price')] = df['Close'].iloc[i]
+```
+
+# Task 4
+
+# Backtesting Trading Strategies Across Timeframes
+
+This project implements a backtesting framework for trading strategies on financial derivatives (Nifty, BankNifty, FinNifty). It allows users to apply and evaluate strategies such as Moving Average Crossover and RSI across multiple timeframes.
+
+## Overview
+
+The backtesting framework:
+- Loads historical market data.
+- Applies selected trading strategies.
+- Resamples data for different timeframes (1 minute, 5 minutes, 1 hour, daily).
+- Generates performance metrics for each strategy and timeframe.
+- ```
+  def backtest_strategy(df, strategy_func, timeframe):
+    df_resampled = df.resample(timeframe).agg({
+        'Open': 'first',
+        'High': 'max',
+        'Low': 'min',
+        'Close': 'last',
+        'Volume': 'sum'
+    }).dropna()
+    df_signals = strategy_func(df_resampled)
+    df_signals['Position'] = df_signals['Signal'].diff()
+
+    df_signals['Returns'] = df_signals['Close'].pct_change()
+    df_signals['Strategy_Returns'] = df_signals['Returns'] * df_signals['Position'].shift(1)
+
+    # Calculate backtesting metrics
+    num_trades = len(df_signals['Position'][df_signals['Position'] != 0])
+    total_profit_loss = df_signals['Strategy_Returns'].sum()
+    win_rate = (df_signals['Strategy_Returns'][df_signals['Strategy_Returns'] > 0].count() / num_trades) * 100
+    sharpe_ratio = df_signals['Strategy_Returns'].mean() / df_signals['Strategy_Returns'].std()
+    max_drawdown = (df_signals['Strategy_Returns'].cumsum().max() - df_signals['Strategy_Returns'].cumsum().min()) / df_signals[
+        'Strategy_Returns'].cumsum().max()
+
+    results = {
+        'Number of Trades': num_trades,
+        'Total Profit/Loss': total_profit_loss,
+        'Win Rate': win_rate,
+        'Sharpe Ratio': sharpe_ratio,
+        'Maximum Drawdown': max_drawdown
+    }
+
+    return results
+  ```
+
+## Key Features
+- **Multiple Timeframe Backtesting:** Evaluate strategies across various timeframes, including 1 minute, 5 minutes, 1 hour, and daily.
+- **Performance Metrics:** Provides insights into trading performance, including:
+  - Number of trades
+  - Total profit/loss
+  - Win rate (percentage of profitable trades)
+  - Sharpe ratio (risk-adjusted return)
+  - Maximum drawdown (largest drop from a peak)
 
 ## Installation
 1. Clone the repository:
