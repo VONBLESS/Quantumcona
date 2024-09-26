@@ -103,7 +103,7 @@ strategy = input("Choose a trading strategy (Moving Average Crossover, RSI, Boll
 # Map the user input to actual ticker symbols
 ticker_map = {
     "Nifty": "NSEI",
-    "BankNifty": "^NSEBANK",
+    "BankNifty": "NSEBANK",
     "FinNifty": "NIFTY_FIN_SERVICE.NS"
 }
 

@@ -39,7 +39,7 @@ def load_data(ticker):
         raise ValueError(f"No data found for ticker {ticker}")
 
 # Strategy: Moving Average Crossover
-def moving_average_crossover(df, short_window=20, long_window=50, stop_loss_pct=0.08):
+def moving_average_crossover(df, short_window=20, long_window=50, stop_loss_pct=0.02):
     """
     Moving Average Crossover strategy with stop-loss logic.
 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     ticker_map = {
         "Nifty": "NSEI",
-        "BankNifty": "^NSEBANK",
+        "BankNifty": "NSEBANK",
         "FinNifty": "NIFTY_FIN_SERVICE.NS"
     }
 
@@ -152,12 +152,12 @@ if __name__ == "__main__":
 
         if strategy == "Moving Average Crossover":
             df = moving_average_crossover(df)
-            output_file = f"{BASE_OUTPUT_DIR}/MAC_trading_signals.xlsx"
+            output_file = f"{BASE_OUTPUT_DIR}/task_3_MAC_trading_signals.xlsx"
             df.to_excel(output_file, index=True)
             # print(df[['Close', 'SMA_Short', 'SMA_Long', 'Signal', 'Entry_Price', 'Exit_Price']])
         elif strategy == "RSI":
             df = rsi_strategy(df)
-            output_file = f"{BASE_OUTPUT_DIR}/RSI_trading_signals.xlsx"
+            output_file = f"{BASE_OUTPUT_DIR}/task_3_RSI_trading_signals.xlsx"
             df.to_excel(output_file, index=True)
             # print(df[['Close', 'RSI', 'Signal', 'Entry_Price', 'Exit_Price']])
         else:

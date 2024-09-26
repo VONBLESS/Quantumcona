@@ -44,7 +44,7 @@ if __name__ == "__main__":
     timeframe_list = ['1Min', '5Min', '1h', '1D', '1ME']  # Define the list of timeframes to backtest
     ticker_map = {
         "Nifty": "NSEI",
-        "BankNifty": "^NSEBANK",
+        "BankNifty": "NSEBANK",
         "FinNifty": "NIFTY_FIN_SERVICE.NS"
     }
 
