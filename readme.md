@@ -189,9 +189,74 @@ This project allows users to load and analyze historical data for different deri
    - The selected trading strategy (Moving Average Crossover, RSI, Bollinger Bands) is applied to the resampled data to generate trading signals.
 5. **Export Processed Data:**
    - The final processed data, including trading signals, is saved as an Excel file in the `output` directory.
-  
 
-     
+# Task 3
+
+# Derivatives Backtesting with Signal Generation
+
+This project implements a backtesting framework that allows users to load historical data for derivatives (Nifty, BankNifty, FinNifty) and generate trading signals based on selected strategies. The strategies include Moving Average Crossover and RSI, with optional stop-loss functionality. Users can dynamically select the derivative, strategy, and expiry date.
+
+## Key Features
+- **Data Loading:** Loads historical data for Nifty, BankNifty, and FinNifty from Parquet files organized in a Year/Month structure.
+- **Moving Average Crossover Strategy:** Buy and sell signals based on the crossover of short-term and long-term moving averages.
+- **RSI (Relative Strength Index) Strategy:** Buy when oversold (RSI < 30) and sell when overbought (RSI > 70).
+- **Stop-Loss Logic:** Optional stop-loss mechanism to manage risk by automatically exiting positions when losses exceed a predefined percentage.
+- **Support for Multiple Expiries:** Handles multiple expiries and derivatives with dynamic data loading.
+
+## Directory Structure
+The historical data is stored in the `data` folder, structured by Year and Month:
+
+
+The processed trading signals are saved in the `output` folder:
+
+
+## Strategies
+### 1. **Moving Average Crossover**
+This strategy generates buy and sell signals based on the crossover of two moving averages:
+- **Buy Signal:** When the short-term moving average (e.g., 20-day) crosses above the long-term moving average (e.g., 50-day).
+- **Sell Signal:** When the short-term moving average crosses below the long-term moving average.
+- **Stop-Loss:** Automatically exits the trade if the price falls below a certain percentage (default is 8%) from the entry price.
+
+### 2. **RSI (Relative Strength Index)**
+This strategy generates buy and sell signals based on the RSI indicator:
+- **Buy Signal:** When RSI < 30, indicating oversold conditions.
+- **Sell Signal:** When RSI > 70, indicating overbought conditions.
+- **Stop-Loss:** Automatically exits the trade if the price drops by more than 2% from the entry price.
+
+## How It Works
+1. **Load Historical Data:**
+   - The script loads historical data for the selected derivative (`Nifty`, `BankNifty`, `FinNifty`).
+   - Data is stored in Parquet format, organized by Year/Month.
+
+2. **Select Trading Strategy:**
+   - The user selects one of the following strategies: Moving Average Crossover or RSI.
+
+3. **Generate Trading Signals:**
+   - Based on the selected strategy, buy/sell signals are generated.
+   - The script includes optional stop-loss logic to manage risk.
+
+4. **Save Results:**
+   - The generated signals and relevant data (e.g., entry/exit prices) are saved to an Excel file in the `output` folder.
+
+## Input Parameters
+1. **Derivative Selection:** Choose from Nifty, BankNifty, or FinNifty.
+2. **Strategy Selection:** Select either Moving Average Crossover or RSI.
+3. **Optional Parameters:**
+   - **Stop-Loss Percentage**: Define a stop-loss percentage for risk management.
+   - **Short-term and Long-term Window:** Customize the short-term and long-term windows for the Moving Average Crossover strategy.
+   - **RSI Period:** Customize the period for the RSI calculation.
+
+## Trading Strategies in Detail
+### Moving Average Crossover
+- **Buy Signal:** When the short-term moving average crosses above the long-term moving average.
+- **Sell Signal:** When the short-term moving average crosses below the long-term moving average.
+- **Stop-Loss:** Automatically exits the trade if the price falls more than the specified percentage below the entry price.
+
+### RSI (Relative Strength Index)
+- **Buy Signal:** When RSI is below 30 (oversold conditions).
+- **Sell Signal:** When RSI is above 70 (overbought conditions).
+- **Stop-Loss:** Automatically exits the trade if the price drops more than the specified percentage below the entry price.
+
 
 ## Installation
 1. Clone the repository:
