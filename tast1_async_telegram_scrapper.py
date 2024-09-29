@@ -5,19 +5,15 @@ import asyncio
 from telethon import TelegramClient, errors
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Replace with your own credentials
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
-phone_number = os.getenv('PHONE_NUMBER')  # Your phone number used to sign up for Telegram
-group_link = os.getenv('GROUP_LINK')  # Your group invite link
+phone_number = os.getenv('PHONE_NUMBER')
+group_link = os.getenv('GROUP_LINK')
 
-# Specify the download directory
 DOWNLOAD_DIR = 'telegram_data'
 
-# Create a Telegram client
 session_name = 'session_name'
 client = TelegramClient(session_name, api_id, api_hash)
 
@@ -35,43 +31,34 @@ async def download_file(message, category, year, month, file_name):
         logging.error(f'Failed to download {file_name}: {e}')
 
 async def main():
-    # Connect to the client
     await client.start()
 
-    # Resolve the group using the invite link
     group = await client.get_entity(group_link)
 
-    download_tasks = []  # List to hold all download tasks
+    download_tasks = []
 
-    # Get all messages in the group
     async for message in client.iter_messages(group):
         logging.info(f"Processing message ID: {message.id}, Date: {message.date}")
 
-        # Check if the message contains a document
         if message.document:
             file_name = message.document.attributes[0].file_name
             logging.info(f"Found document: {file_name}")
 
-            # Only process files with a .feather extension
             if file_name.endswith('.feather'):
-                # Check if file is nfo or bfo and extract date from file name
                 category = 'nfo' if 'nfo' in file_name.lower() else 'bfo' if 'bfo' in file_name.lower() else None
                 if category is None:
                     logging.warning(f"File {file_name} is neither NFO nor BFO.")
                     continue  # Skip files that don't contain nfo or bfo
 
-                # Extract the date from the file name
                 match = re.match(r'(\d{4})-(\d{1,2})-(\d{1,2})', file_name)
                 if match:
                     year, month, _ = match.groups()
-                    # Create a download task and add it to the list
                     download_tasks.append(download_file(message, category, year, month, file_name))
                 else:
                     logging.warning(f"File name {file_name} does not match date format.")
         else:
             logging.info("No document found in this message.")
 
-    # Run all download tasks concurrently
     if download_tasks:
         await asyncio.gather(*download_tasks)
 
