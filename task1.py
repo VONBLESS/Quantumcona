@@ -69,7 +69,7 @@ def process_and_save_all_data(tickers):
 process_and_save_all_data(tickers)
 
 # Example of loading Nifty data for processing
-nifty_df = load_data('^NSEI'.replace('^', '').replace('.', '_'))
+nifty_df = load_data('NSEI')
 print(nifty_df.head())
 nifty_df = load_data('NSEBANK')
 print(nifty_df.head())
