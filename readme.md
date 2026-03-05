@@ -1,3 +1,34 @@
+# Quantumcona
+
+Quantumcona project repository.
+
+## Overview
+This repository contains the implementation, configuration, and supporting assets for this project.
+
+## Features
+- Automated tests
+
+## Tech Stack
+- Python
+
+## Project Structure
+- `.idea/`
+
+## Quick Start
+```bash
+pip install -r requirements.txt
+```
+
+## Contributing
+Contributions are welcome. Please open an issue for major changes before submitting a PR.
+
+## License
+Add your project license details here.
+
+---
+
+## Legacy Notes
+
 All tasks given on task.pdf file in this repo
 ---
 # Task 1
