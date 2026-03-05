@@ -387,3 +387,18 @@ The backtesting framework:
     ```bash
     pip install -r requirements.txt
     ```
+
+## Tech Stack
+- Python
+
+## Quick Start
+```bash
+pip install -r requirements.txt
+```
+
+## Project Structure
+- `.idea/`
+- `__pycache__/`
+
+## Contributing
+Contributions are welcome. Open an issue or submit a pull request.
